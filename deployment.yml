@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: votingapp
+  namespace: default
+  labels:
+    app: votingapp
+spec:
+  selector:
+    matchLabels:
+      app: votingapp
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: votingapp
+    spec:
+      containers:
+      - name: votingapp
+        image: kirito4243/voting-app:kube
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+      - name: redis
+        image: redis:alpine
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        ports:
+        - containerPort: 6379
+          name: redis
+      imagePullSecrets:
+      - name: my-registry-secret
